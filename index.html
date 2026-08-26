@@ -465,6 +465,33 @@
       scroll-behavior: auto !important;
     }
   }
+  .gift {
+  margin-top: 30px;
+  animation: finalText .8s .65s both;
+}
+
+.gift-title {
+  color: #e83468;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 900;
+}
+
+.gift-subtitle {
+  margin-top: 7px;
+  margin-bottom: 18px;
+  color: #765465;
+  font-size: 1rem;
+}
+
+.gift video {
+  width: min(560px, 100%);
+  max-height: 60vh;
+  border-radius: 22px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 18px 45px rgba(157, 45, 87, .20);
+  background: #1f1720;
+}
 </style>
 </head>
 <body>
@@ -529,6 +556,15 @@
         this feels surreal😭
       </div>
       <div class="signature">okay wow... look at us 🥹❤️</div>
+      <div class="gift">
+  <div class="gift-title">And one more thing... 🥰</div>
+  <div class="gift-subtitle">A small gift from my side for you ❤️</div>
+
+  <video controls playsinline preload="metadata">
+    <source src="aastha_askout.mp4" type="video/mp4">
+    Your browser doesn't support video playback.
+  </video>
+</div>
     </div>
 
     <div class="progress" aria-hidden="true">
