@@ -525,11 +525,69 @@
     box-shadow: 0 18px 45px rgba(157, 45, 87, .20);
     background: #1f1720;
 }
+  .music-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 50;
+
+  padding: 10px 15px;
+  border-radius: 999px;
+
+  color: #7b304f;
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(255,79,129,.15);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: 0 8px 25px rgba(157,45,87,.12);
+
+  font-size: .9rem;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    box-shadow .18s ease;
+}
+
+.music-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(157,45,87,.17);
+}
+
+.music-toggle:active {
+  transform: scale(.96);
+}
+
+.music-toggle.off {
+  opacity: .72;
+  background: rgba(255,255,255,.65);
+}
+
+@media (max-width: 560px) {
+  .music-toggle {
+    top: 12px;
+    right: 12px;
+    padding: 9px 13px;
+    font-size: .82rem;
+  }
+}
 </style>
 </head>
 <body>
+  <audio id="bgMusic" loop preload="auto">
+  <source src="4thofjuly.mp3" type="audio/mpeg">
+  Your browser doesn't support audio playback.
+</audio>
 <div class="ambient-glow"></div>
 <div class="hearts" aria-hidden="true" id="hearts"></div>
+  <button id="musicToggle" class="music-toggle" onclick="toggleMusic()">
+  🎵 Music: ON
+</button>
 
 <main class="app">
   <section class="card" id="card" aria-live="polite">
@@ -593,10 +651,15 @@
   <div class="gift-title">And one more thing... 🥰</div>
   <div class="gift-subtitle">A small gift from my side for you ❤️</div>
 
-  <video controls playsinline preload="metadata">
-    <source src="aastha_askout.mp4" type="video/mp4">
-    Your browser doesn't support video playback.
-  </video>
+  <video
+  id="askoutVideo"
+  controls
+  playsinline
+  preload="metadata"
+>
+  <source src="aastha_askout.mp4" type="video/mp4">
+  Your browser doesn't support video playback.
+</video>
 </div>
     </div>
 
@@ -609,6 +672,69 @@
 </main>
 
 <script>
+  const bgMusic = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
+
+let musicStarted = false;
+let musicManuallyPaused = false;
+
+function startMusic() {
+  if (musicStarted || musicManuallyPaused) return;
+
+  bgMusic.volume = 0.45;
+
+  bgMusic.play()
+    .then(() => {
+      musicStarted = true;
+      updateMusicButton();
+    })
+    .catch(err => {
+      console.log("Music couldn't autoplay:", err);
+    });
+}
+
+function toggleMusic() {
+
+  if (bgMusic.paused) {
+
+    bgMusic.play()
+      .then(() => {
+        musicManuallyPaused = false;
+        musicStarted = true;
+        updateMusicButton();
+      })
+      .catch(err => {
+        console.log("Music couldn't play:", err);
+      });
+
+  } else {
+
+    bgMusic.pause();
+    musicManuallyPaused = true;
+    updateMusicButton();
+  }
+}
+
+function updateMusicButton() {
+
+  if (bgMusic.paused) {
+    musicToggle.textContent = '🎵 Music: OFF';
+    musicToggle.classList.add('off');
+  } else {
+    musicToggle.textContent = '🎵 Music: ON';
+    musicToggle.classList.remove('off');
+  }
+}
+  const askoutVideo = document.getElementById('askoutVideo');
+
+askoutVideo.addEventListener('play', () => {
+  bgMusic.pause();
+  updateMusicButton();
+});
+
+askoutVideo.addEventListener('ended', () => {
+  updateMusicButton();
+});
   // Floating heart field
   const heartContainer = document.getElementById('hearts');
   const heartSymbols = ['❤','♡','♥','💕','💗','💖','💘','💞'];
@@ -647,18 +773,30 @@
   let currentScreen = 1;
 
   function nextScreen(screenNumber) {
-    document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-    document.getElementById(`screen${screenNumber}`).classList.add('active');
-    currentScreen = screenNumber;
-    updateDots();
 
-    if (screenNumber === 2) {
-      setTimeout(() => createSparkleBurst(12), 300);
-    }
-    if (screenNumber === 3) {
-      setTimeout(() => createSparkleBurst(18), 260);
-    }
+  // Start music on the first user interaction.
+  // This avoids browser autoplay restrictions.
+  if (screenNumber === 2) {
+    startMusic();
   }
+
+  document.querySelectorAll('.screen')
+    .forEach(el => el.classList.remove('active'));
+
+  document.getElementById(`screen${screenNumber}`)
+    .classList.add('active');
+
+  currentScreen = screenNumber;
+  updateDots();
+
+  if (screenNumber === 2) {
+    setTimeout(() => createSparkleBurst(12), 300);
+  }
+
+  if (screenNumber === 3) {
+    setTimeout(() => createSparkleBurst(18), 260);
+  }
+}
 
   function updateDots() {
     [1,2,3].forEach(n => {
